@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     const apiKey = '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';
-    const apiUrl = 'https://api.openai.com/v1/engines/davinci-codex/completions';
+    const apiUrl = 'https://api.openai.com/v1/engines/davinci/completions';
 
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('user-input');
