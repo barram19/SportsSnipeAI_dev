@@ -29,7 +29,8 @@ document.addEventListener("DOMContentLoaded", function() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Authorization': `Bearer ${apiKey},
+                'OpenAI-Beta': assistants=v1
             },
             body: JSON.stringify({
                 model: 'gpt-4-1106-preview', // Update to the model you're using, if necessary
