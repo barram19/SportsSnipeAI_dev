@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function sendToChatGPT(message) {
         // Make API request to OpenAI Assistant
-        fetch(`https://api.openai.com/v1/assistants/${assistantId}/completions`, {
+        fetch(`https://api.openai.com/v1/assistants/completions`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
