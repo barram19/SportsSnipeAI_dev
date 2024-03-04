@@ -30,22 +30,17 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiKey},
-                'OpenAI-Beta': 'assistants=v1'
+                'OpenAI-Beta': 'assistants=v1',
             },
             body: JSON.stringify({
                 model: 'gpt-4-1106-preview', // Update to the model you're using, if necessary
                 messages: [
                     {
-                        role: "system",
-                        content: "Your assistant-specific instructions here" // Any specific instructions
-                    },
-                    {
                         role: 'user',
                         content: message,
                     },
                 ],
-            }),
-        })
+            })
         .then(response => response.json())
         .then(data => {
             // Assuming the response structure has a list of messages where the last one is the assistant's response
