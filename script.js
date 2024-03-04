@@ -24,45 +24,87 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    async function sendMessage(message) {
-        displayMessage(message, 'user'); // Display user message
-        conversationHistory.push({role: "user", content: message}); // Add user message to history
-        await sendToOpenAI(message); // Send user message to OpenAI Assistant
+    const openai = new OpenAI();
+
+    async function main() {
+      const myAssistant = await openai.beta.assistants.retrieve(
+        "asst_dZt5ChuOku6xFx3ysGBvZ90u"
+      );
+    
+      console.log(myAssistant);
+    }
+    
+ // Handles the conversation flow: creating a thread, adding a message, and getting a response
+    async function handleConversation(userMessage) {
+        displayMessage(userMessage, 'user'); // Display user's message
+
+        // Step 1: Create a new thread (assuming your server endpoint handles thread creation)
+        const threadResponse = await fetch('https://api.openai.com/v1/threads', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey},
+                'OpenAI-Beta': 'assistants=v1'
+                }
+                // No body required for thread creation, assuming your server handles it
+        });
+        const thread = await threadResponse.json();
+        const threadId = thread.id; // Extract the thread ID from the response
+
+        // Step 2: Add the user's message to the thread
+        await fetch(`/server/add-message-to-thread/${threadId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ role: "user", content: userMessage })
+        });
+
+        // Step 3: Create a run to get the assistant's response
+        const runResponse = await fetch(`/server/create-run/${threadId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ assistantId: 'asst_dZt5ChuOku6xFx3ysGBvZ90u' }) // Use your assistant ID
+        });
+        const runData = await runResponse.json();
+
+        // Assuming the server returns the assistant's latest message in the run's response
+        const assistantMessage = runData.latest_message.content;
+        displayMessage(assistantMessage, 'bot'); // Display assistant's response
     }
 
-    async function sendToOpenAI(message) {
-        try {
-            const response = await fetch(`https://api.openai.com/v1/assistants/${assistantId}/messages`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    model: "gpt-3.5-turbo", // Specify the model you're using
-                    messages: conversationHistory // Include conversation history for context
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            const assistantResponse = data.choices[0].message.content; // Assuming this is the correct path to the response
-            conversationHistory.push({role: "assistant", content: assistantResponse}); // Add assistant response to history
-            displayMessage(assistantResponse, 'bot'); // Display the assistant's response
-        } catch (error) {
-            console.error('Error:', error);
-            displayMessage('Sorry, an error occurred. Please try again.', 'bot');
-        }
-    }
-
+    // Utility function to display messages in the chat box
     function displayMessage(message, sender) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', sender); // 'user' or 'bot'
-        messageElement.innerText = message;
+        messageElement.textContent = `${sender === 'user' ? 'You' : 'Assistant'}: ${message}`;
         chatBox.appendChild(messageElement);
-        chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the bottom
     }
 });
+    
+    // Function to handle threading messages and receiving the response
+    const openai = new OpenAI();
+// Replace 'YOUR_SERVER_ENDPOINT' with the endpoint where you handle the API request on your server
+        fetch('https://api.openai.com/v1/threads', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+                'Authorization': `Bearer ${apiKey}`
+                'OpenAI-Beta': 'assistants=v1'
+    async function main() {
+      const messageThread = await openai.beta.threads.create({
+        messages: [
+          {
+            role: "user",
+            content: message,
+            file_ids: [],
+          },
+          {
+            role: "user",
+            content: message,
+          },
+        ],
+      });
+    
+      console.log(messageThread);
+    }
+        
