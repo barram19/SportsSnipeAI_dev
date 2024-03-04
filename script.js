@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiKey},
-                'OpenAI-Beta': assistants=v1
+                'OpenAI-Beta': 'assistants=v1'
             },
             body: JSON.stringify({
                 model: 'gpt-4-1106-preview', // Update to the model you're using, if necessary
