@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 'Authorization': `Bearer ${apiKey}`,
             },
             body: JSON.stringify({
-                model: 'text-davinci-003', // The model you're using
+                model: 'gpt-4-1106-preview', // The model you're using
                 messages: [
                     {
                         role: 'user',
@@ -51,8 +51,10 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(error => {
             console.error('Error:', error);
-            displayMessage('Sorry, an error occurred while processing your request.', 'bot');
+            console.error('Error response:', error.response); // Log the error response
+            displayMessage('Sorry, an error occurred while processing your request. Please try again later.', 'bot');
         });
+
     }
 
     function displayMessage(message, sender) {
