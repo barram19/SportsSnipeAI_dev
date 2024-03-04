@@ -29,38 +29,35 @@ document.addEventListener("DOMContentLoaded", function() {
         sendToAssistant(message); // Send user message to OpenAI Assistant
     }
 
-function sendToAssistant(message) {
-    if (!sessionId) {
-        // Attempt to start a session and send the message once successful
-        startSession().then(() => {
-            if (sessionId) {
-                sendToAssistant(message); // Only resend message if session was successfully started
-            } else {
-                console.error('Session could not be started.');
-                displayMessage('Unable to start session. Please try again later.', 'bot');
-            }
-        });
-        return; // Exit the function to prevent further execution until the session is started
-    }
+// Assuming we have a global variable to hold the conversation history
+let conversationHistory = [];
 
-    const requestBody = {
-        input: message,
-        // Assuming 'input' and 'session' are the correct fields; adjust based on actual API
-        session: sessionId // Use the session ID for context
+function sendToAssistant(message) {
+    // Add the user's message to the conversation history
+    conversationHistory.push({ role: 'user', content: message });
+
+    // Prepare the request payload, including the conversation history
+    const payload = {
+        model: "gpt-3.5-turbo", // Specify the model you're using
+        messages: conversationHistory, // Include the entire conversation history
     };
 
     fetch(`https://api.openai.com/v1/assistants/${assistantId}/messages`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
+            'Authorization': `Bearer ${apiKey}`,
+            'OpenAI-Beta': 'assistants=v1', // Include if needed, based on API version and requirements
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(payload)
     })
     .then(response => response.json())
     .then(data => {
-        const assistantResponse = data.choices[0].message.content; // Adapt based on actual API response structure
-        displayMessage(assistantResponse, 'bot');
+        // Process the response
+        const assistantResponse = data.choices[0].message.content; // Adjust based on actual response structure
+        conversationHistory.push({ role: 'assistant', content: assistantResponse }); // Update conversation history with the assistant's response
+
+        displayMessage(assistantResponse, 'bot'); // Display the assistant's response in the UI
     })
     .catch(error => {
         console.error('Error:', error);
@@ -68,27 +65,6 @@ function sendToAssistant(message) {
     });
 }
 
-function startSession() {
-    return fetch(`https://api.openai.com/v1/assistants/${assistantId}/sessions`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        sessionId = data.id; // Successfully store new session ID
-    })
-    .catch(error => {
-        console.error('Error starting session:', error);
-    });
-}
 
     function displayMessage(message, sender) {
         const messageElement = document.createElement('div');
