@@ -1,95 +1,125 @@
-import openai
-from dotenv import find_dotenv, load_dotenv
+from openai import OpenAI
+import shelve
+from dotenv import load_dotenv
+import os
 import time
-import logging
-from datetime import datetime
 
 load_dotenv()
-# openai.api_key = os.environ.get("OPENAI_API_KEY")
-# defaults to getting the key using os.environ.get("OPENAI_API_KEY")
-# if you saved the key under a different environment variable name, you can do something like:
-# client = OpenAI(
-#   api_key=os.environ.get("CUSTOM_ENV_NAME"),
-# )
-
-client = openai.OpenAI()
-model = "gpt-3.5-turbo-16k"
-
-# # ==  Create our Assistant (Uncomment this to create your assistant) ==
-# personal_trainer_assis = client.beta.assistants.create(
-#     name="Personal Trainer",
-#     instructions="""You are the best personal trainer and nutritionist who knows how to get clients to build lean muscles.\n
-#      You've trained high-caliber athletes and movie stars. """,
-#     model=model,
-# )
-# asistant_id = personal_trainer_assis.id
-# print(asistant_id)
+OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
+client = OpenAI(api_key=OPEN_AI_API_KEY)
 
 
-# === Thread (uncomment this to create your Thread) ===
-# thread = client.beta.threads.create(
-#     messages=[
-#         {
-#             "role": "user",
-#             "content": "How do I get started working out to lose fat and build muscles?",
-#         }
-#     ]
-# )
-# thread_id = thread.id
-# print(thread_id)
-
-# === Hardcode our ids ===
-asistant_id = "asst_7yT5g1MShqrN1534vDrqm810"
-thread_id = "thread_kr871DUEaGcTXkBb2jHO9eJ6"
-
-# ==== Create a Message ====
-message = "How many reps do I need to do to build lean muscles?"
-message = client.beta.threads.messages.create(
-    thread_id=thread_id, role="user", content=message
-)
-
-# === Run our Assistant ===
-run = client.beta.threads.runs.create(
-    thread_id=thread_id,
-    assistant_id=asistant_id,
-    instructions="Please address the user as James Bond",
-)
+# --------------------------------------------------------------
+# Upload file
+# --------------------------------------------------------------
+def upload_file(path):
+    # Upload a file with an "assistants" purpose
+    file = client.files.create(file=open(path, "rb"), purpose="assistants")
+    return file
 
 
-def wait_for_run_completion(client, thread_id, run_id, sleep_interval=5):
+file = upload_file("../data/airbnb-faq.pdf")
+
+
+# --------------------------------------------------------------
+# Create assistant
+# --------------------------------------------------------------
+def create_assistant(file):
     """
-
-    Waits for a run to complete and prints the elapsed time.:param client: The OpenAI client object.
-    :param thread_id: The ID of the thread.
-    :param run_id: The ID of the run.
-    :param sleep_interval: Time in seconds to wait between checks.
+    You currently cannot set the temperature for Assistant via the API.
     """
-    while True:
-        try:
-            run = client.beta.threads.runs.retrieve(thread_id=thread_id, run_id=run_id)
-            if run.completed_at:
-                elapsed_time = run.completed_at - run.created_at
-                formatted_elapsed_time = time.strftime(
-                    "%H:%M:%S", time.gmtime(elapsed_time)
-                )
-                print(f"Run completed in {formatted_elapsed_time}")
-                logging.info(f"Run completed in {formatted_elapsed_time}")
-                # Get messages here once Run is completed!
-                messages = client.beta.threads.messages.list(thread_id=thread_id)
-                last_message = messages.data[0]
-                response = last_message.content[0].text.value
-                print(f"Assistant Response: {response}")
-                break
-        except Exception as e:
-            logging.error(f"An error occurred while retrieving the run: {e}")
-            break
-        logging.info("Waiting for run to complete...")
-        time.sleep(sleep_interval)
+    assistant = client.beta.assistants.create(
+        name="WhatsApp AirBnb Assistant",
+        instructions="You're a helpful WhatsApp assistant that can assist guests that are staying in our Paris AirBnb. Use your knowledge base to best respond to customer queries. If you don't know the answer, say simply that you cannot help with question and advice to contact the host directly. Be friendly and funny.",
+        tools=[{"type": "retrieval"}],
+        model="gpt-4-1106-preview",
+        file_ids=[file.id],
+    )
+    return assistant
 
 
-# === Run ===
-wait_for_run_completion(client=client, thread_id=thread_id, run_id=run.id)
+assistant = create_assistant(file)
 
-# ==== Steps --- Logs ==
-run_steps = client.beta.threads.runs.steps.list(thread_id=thread_id, run_id=run.id)
-print(f"Steps---> {run_steps.data[0]}")
+
+# --------------------------------------------------------------
+# Thread management
+# --------------------------------------------------------------
+def check_if_thread_exists(wa_id):
+    with shelve.open("threads_db") as threads_shelf:
+        return threads_shelf.get(wa_id, None)
+
+
+def store_thread(wa_id, thread_id):
+    with shelve.open("threads_db", writeback=True) as threads_shelf:
+        threads_shelf[wa_id] = thread_id
+
+
+# --------------------------------------------------------------
+# Generate response
+# --------------------------------------------------------------
+def generate_response(message_body, wa_id, name):
+    # Check if there is already a thread_id for the wa_id
+    thread_id = check_if_thread_exists(wa_id)
+
+    # If a thread doesn't exist, create one and store it
+    if thread_id is None:
+        print(f"Creating new thread for {name} with wa_id {wa_id}")
+        thread = client.beta.threads.create()
+        store_thread(wa_id, thread.id)
+        thread_id = thread.id
+
+    # Otherwise, retrieve the existing thread
+    else:
+        print(f"Retrieving existing thread for {name} with wa_id {wa_id}")
+        thread = client.beta.threads.retrieve(thread_id)
+
+    # Add message to thread
+    message = client.beta.threads.messages.create(
+        thread_id=thread_id,
+        role="user",
+        content=message_body,
+    )
+
+    # Run the assistant and get the new message
+    new_message = run_assistant(thread)
+    print(f"To {name}:", new_message)
+    return new_message
+
+
+# --------------------------------------------------------------
+# Run assistant
+# --------------------------------------------------------------
+def run_assistant(thread):
+    # Retrieve the Assistant
+    assistant = client.beta.assistants.retrieve("asst_7Wx2nQwoPWSf710jrdWTDlfE")
+
+    # Run the assistant
+    run = client.beta.threads.runs.create(
+        thread_id=thread.id,
+        assistant_id=assistant.id,
+    )
+
+    # Wait for completion
+    while run.status != "completed":
+        # Be nice to the API
+        time.sleep(0.5)
+        run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+
+    # Retrieve the Messages
+    messages = client.beta.threads.messages.list(thread_id=thread.id)
+    new_message = messages.data[0].content[0].text.value
+    print(f"Generated message: {new_message}")
+    return new_message
+
+
+# --------------------------------------------------------------
+# Test assistant
+# --------------------------------------------------------------
+
+new_message = generate_response("What's the check in time?", "123", "John")
+
+new_message = generate_response("What's the pin for the lockbox?", "456", "Sarah")
+
+new_message = generate_response("What was my previous question?", "123", "John")
+
+new_message = generate_response("What was my previous question?", "456", "Sarah")
