@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 'Authorization': `Bearer ${apiKey}`,
             },
             body: JSON.stringify({
-                model: 'gpt-4-1106-preview', // The model you're using
+                model: 'gpt-4-turbo-preview', // The model you're using
                 messages: [
                     {
                         role: 'user',
