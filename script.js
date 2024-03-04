@@ -1,46 +1,63 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const apiKey = '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';
-    const apiUrl = 'https://api.openai.com/v1/engines/davinci/completions';
-
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
+    const sendButton = document.getElementById('send-btn');
+    const assistantId = 'asst_dZt5ChuOku6xFx3ysGBvZ90u'; // Replace with your OpenAI Assistant ID
+    const apiKey = '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'; // Replace with your actual API key
 
-    sendBtn.addEventListener('click', sendMessage);
+    sendButton.addEventListener('click', () => {
+        sendMessage(userInput.value);
+    });
 
-    function sendMessage() {
-        const message = userInput.value.trim();
-        if (message === '') return;
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage(userInput.value);
+        }
+    });
 
+    function sendMessage(message) {
+        // Display user message
         displayMessage(message, 'user');
 
-        sendMessageToAI(message).then(response => {
-            displayMessage(response, 'ai');
-        });
-
-        userInput.value = '';
+        // Send user message to OpenAI Assistant
+        sendToChatGPT(message);
     }
 
-    async function sendMessageToAI(message) {
-        const response = await fetch(apiUrl, {
+    function sendToChatGPT(message) {
+        // Make API request to OpenAI Assistant
+        fetch(`https://api.openai.com/v1/assistants/${assistantId}/completions`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Authorization': `Bearer ${apiKey}`,
             },
             body: JSON.stringify({
-                prompt: message,
-                max_tokens: 150
-            })
+                model: 'text-davinci-003', // The model you're using
+                messages: [
+                    {
+                        role: 'user',
+                        content: message,
+                    },
+                ],
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Extract response from OpenAI Assistant
+            const assistantResponse = data.choices[0].message.content;
+
+            // Display Assistant response
+            displayMessage(assistantResponse, 'bot');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            displayMessage('Sorry, an error occurred while processing your request.', 'bot');
         });
-        const data = await response.json();
-        return data.choices[0].text.trim();
     }
 
     function displayMessage(message, sender) {
         const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        messageElement.classList.add(sender === 'ai' ? 'ai-message' : 'user-message');
+        messageElement.classList.add('message', sender);
         messageElement.innerText = message;
         chatBox.appendChild(messageElement);
 
