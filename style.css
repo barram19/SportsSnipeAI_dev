@@ -57,3 +57,21 @@ body {
 #chat-form button:hover {
     background-color: #007ACC; /* Slightly darker blue on hover */
 }
+
+/* Styles for user messages */
+.user-message {
+    background-color: #202020; /* Darker shade for user messages */
+    color: #FFFFFF;
+    padding: 10px;
+    margin-bottom: 12px; /* Space after each message */
+    border-radius: 8px;
+}
+
+/* Styles for assistant responses */
+.assistant-response {
+    background-color: #1E90FF; /* Lighter shade for assistant messages */
+    color: #FFFFFF;
+    padding: 10px;
+    margin-bottom: 12px; /* Space after each message */
+    border-radius: 8px;
+}
