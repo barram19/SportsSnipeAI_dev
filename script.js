@@ -4,8 +4,9 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     const userInput = document.getElementById('user-input').value;
     const chatBox = document.getElementById('chat-box');
 
-    // Display user's question
+    // When displaying the user's question
     const userDiv = document.createElement('div');
+    userDiv.classList.add('user-message'); // Add class for user messages
     userDiv.textContent = `You: ${userInput}`;
     chatBox.appendChild(userDiv);
 
@@ -19,9 +20,11 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-        data.messages.forEach((message) => {  // Accessing the array within the object
+        // When displaying the assistant's response
+        data.messages.forEach((message) => {
             const responseDiv = document.createElement('div');
-            responseDiv.textContent = `Assistant: ${message}`; // Display each message
+            responseDiv.classList.add('assistant-response'); // Add class for assistant responses
+            responseDiv.textContent = `Assistant: ${message}`;
             chatBox.appendChild(responseDiv);
         });
     })
