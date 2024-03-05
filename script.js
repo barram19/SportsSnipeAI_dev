@@ -5,14 +5,16 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     const chatBox = document.getElementById('chat-box');
     const loadingIndicator = document.getElementById('loading-indicator');
 
-    // Show the loading indicator
-    loadingIndicator.style.display = 'block';
     // When displaying the user's question
     const userDiv = document.createElement('div');
     userDiv.classList.add('user-message'); // Add class for user messages
     userDiv.textContent = `You: ${userInput}`;
     chatBox.appendChild(userDiv);
 
+ // Temporarily append the loading indicator to the chat box
+    chatBox.appendChild(loadingIndicator);
+    loadingIndicator.style.display = 'block'; // Make it visible
+    
     // Call the Google Cloud Function
     fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
         method: 'POST',
@@ -23,22 +25,27 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-        // Hide the loading indicator
-        loadingIndicator.style.display = 'none';
+        // Once the response is ready, remove the loading indicator
+        chatBox.removeChild(loadingIndicator);
+        loadingIndicator.style.display = 'none'; // Hide it again for future use
 
         data.messages.forEach((message) => {
             const responseDiv = document.createElement('div');
             responseDiv.textContent = `Assistant: ${message}`;
             chatBox.appendChild(responseDiv);
         });
+        
+    // Scroll to the latest message
+        chatBox.scrollTop = chatBox.scrollHeight;
+        
     })
     .catch((error) => {
         console.error('Error:', error);
-        // Hide the loading indicator even if there's an error
+        // Ensure to remove the loading indicator even if an error occurs
+        chatBox.removeChild(loadingIndicator);
         loadingIndicator.style.display = 'none';
     });
 
     // Clear input after sending
     document.getElementById('user-input').value = '';
 });
-//update 5
