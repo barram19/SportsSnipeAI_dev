@@ -10,7 +10,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     chatBox.appendChild(userDiv);
 
     // Call the Google Cloud Function
-    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
+    fetch('https://your-cloud-function-url', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -19,11 +19,22 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-    const responseDiv = document.createElement('div');
-    responseDiv.textContent = `Assistant: ${data.your}`; // Adjust this line based on actual key names in your JSON
-    chatBox.appendChild(responseDiv);
+        // Clear previous assistant responses
+        chatBox.querySelectorAll('.assistant-response').forEach(el => el.remove());
+
+        // Iterate over each message in the array and display it
+        data.forEach((message) => {
+            const responseDiv = document.createElement('div');
+            responseDiv.classList.add('assistant-response'); // Add class for styling or clearing
+            responseDiv.textContent = `Assistant: ${message}`;
+            chatBox.appendChild(responseDiv);
+        });
     })
-})
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
     // Clear input after sending
     document.getElementById('user-input').value = '';
 });
+//Update1
