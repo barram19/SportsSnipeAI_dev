@@ -75,3 +75,7 @@ body {
     margin-bottom: 12px; /* Space after each message */
     border-radius: 8px;
 }
+
+#loading-indicator {
+    margin: 20px 0; /* Add some space around the indicator */
+}
