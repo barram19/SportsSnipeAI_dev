@@ -19,17 +19,13 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-        // Clear previous assistant responses
-        chatBox.querySelectorAll('.assistant-response').forEach(el => el.remove());
+    data.messages.forEach((message) => {  // Adjusted to access the array within the object
+        const responseDiv = document.createElement('div');
+        responseDiv.textContent = `Assistant: ${message}`;
+        chatBox.appendChild(responseDiv);
+    });
+})
 
-        // Iterate over each message in the array and display it
-        data.forEach((message) => {
-            const responseDiv = document.createElement('div');
-            responseDiv.classList.add('assistant-response'); // Add class for styling or clearing
-            responseDiv.textContent = `Assistant: ${message}`;
-            chatBox.appendChild(responseDiv);
-        });
-    })
     .catch((error) => {
         console.error('Error:', error);
     });
