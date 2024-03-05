@@ -1,0 +1,59 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0A0A0A; /* Dark background for contrast */
+    color: #FFFFFF; /* White text for readability */
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#chat-container {
+    width: 60%;
+    max-width: 800px;
+    margin: 5% auto;
+    border: 2px solid #1E90FF; /* Vibrant blue border */
+    background-color: #121212; /* Slightly lighter dark background for the chat area */
+    box-shadow: 0 4px 8px rgba(30, 144, 255, 0.2); /* Blue shadow for depth */
+    border-radius: 12px;
+}
+
+#chat-box {
+    height: 500px;
+    overflow-y: auto;
+    background-color: #181818; /* Darker background for contrast */
+    padding: 20px;
+    border-bottom: 2px solid #1E90FF; /* Subtle separation with blue */
+    border-radius: 10px 10px 0 0;
+}
+
+#chat-form {
+    display: flex;
+    padding: 10px;
+    background: #121212; /* Matching the chat-container background */
+    border-radius: 0 0 10px 10px;
+}
+
+#chat-form input[type="text"] {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #1E90FF; /* Vibrant blue border */
+    background: #0A0A0A; /* Dark background */
+    color: #FFFFFF; /* White text */
+    border-radius: 25px;
+    margin-right: 10px;
+}
+
+#chat-form button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #1E90FF; /* Vibrant blue for button */
+    color: #FFFFFF;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#chat-form button:hover {
+    background-color: #007ACC; /* Slightly darker blue on hover */
+}
