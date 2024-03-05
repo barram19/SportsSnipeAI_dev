@@ -10,7 +10,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     chatBox.appendChild(userDiv);
 
     // Call the Google Cloud Function
-    fetch('https://your-cloud-function-url', {
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
