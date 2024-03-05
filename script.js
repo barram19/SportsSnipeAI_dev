@@ -19,13 +19,12 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-    data.messages.forEach((message) => {  // Adjusted to access the array within the object
-        const responseDiv = document.createElement('div');
-        responseDiv.textContent = `Assistant: ${message}`;
-        chatBox.appendChild(responseDiv);
-    });
-})
-
+        data.messages.forEach((message) => {  // Accessing the array within the object
+            const responseDiv = document.createElement('div');
+            responseDiv.textContent = `Assistant: ${message}`; // Display each message
+            chatBox.appendChild(responseDiv);
+        });
+    })
     .catch((error) => {
         console.error('Error:', error);
     });
@@ -33,4 +32,4 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     // Clear input after sending
     document.getElementById('user-input').value = '';
 });
-//Update2
+//update 4
