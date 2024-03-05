@@ -33,4 +33,4 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     // Clear input after sending
     document.getElementById('user-input').value = '';
 });
-//Update1
+//Update2
