@@ -3,7 +3,10 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
 
     const userInput = document.getElementById('user-input').value;
     const chatBox = document.getElementById('chat-box');
+    const loadingIndicator = document.getElementById('loading-indicator');
 
+    // Show the loading indicator
+    loadingIndicator.style.display = 'block';
     // When displaying the user's question
     const userDiv = document.createElement('div');
     userDiv.classList.add('user-message'); // Add class for user messages
@@ -20,19 +23,22 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-        // When displaying the assistant's response
+        // Hide the loading indicator
+        loadingIndicator.style.display = 'none';
+
         data.messages.forEach((message) => {
             const responseDiv = document.createElement('div');
-            responseDiv.classList.add('assistant-response'); // Add class for assistant responses
             responseDiv.textContent = `Assistant: ${message}`;
             chatBox.appendChild(responseDiv);
         });
     })
     .catch((error) => {
         console.error('Error:', error);
+        // Hide the loading indicator even if there's an error
+        loadingIndicator.style.display = 'none';
     });
 
     // Clear input after sending
     document.getElementById('user-input').value = '';
 });
-//update 4
+//update 5
