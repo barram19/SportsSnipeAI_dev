@@ -5,40 +5,10 @@ import os
 import time
 
 load_dotenv()
-OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
-client = OpenAI(api_key=OPEN_AI_API_KEY)
-
-
-# --------------------------------------------------------------
-# Upload file
-# --------------------------------------------------------------
-def upload_file(path):
-    # Upload a file with an "assistants" purpose
-    file = client.files.create(file=open(path, "rb"), purpose="assistants")
-    return file
-
-
-file = upload_file("../data/airbnb-faq.pdf")
-
-
-# --------------------------------------------------------------
-# Create assistant
-# --------------------------------------------------------------
-def create_assistant(file):
-    """
-    You currently cannot set the temperature for Assistant via the API.
-    """
-    assistant = client.beta.assistants.create(
-        name="WhatsApp AirBnb Assistant",
-        instructions="You're a helpful WhatsApp assistant that can assist guests that are staying in our Paris AirBnb. Use your knowledge base to best respond to customer queries. If you don't know the answer, say simply that you cannot help with question and advice to contact the host directly. Be friendly and funny.",
-        tools=[{"type": "retrieval"}],
-        model="gpt-4-1106-preview",
-        file_ids=[file.id],
-    )
-    return assistant
-
-
-assistant = create_assistant(file)
+OPEN_AI_API_KEY = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=OPENAI_API_KEY)
+model = "gpt-4-1106-preview"
+assistant_id = "asst_dZt5ChuOku6xFx3ysGBvZ90u"
 
 
 # --------------------------------------------------------------
@@ -91,7 +61,7 @@ def generate_response(message_body, wa_id, name):
 # --------------------------------------------------------------
 def run_assistant(thread):
     # Retrieve the Assistant
-    assistant = client.beta.assistants.retrieve("asst_7Wx2nQwoPWSf710jrdWTDlfE")
+    assistant = client.beta.assistants.retrieve(assistant_id)
 
     # Run the assistant
     run = client.beta.threads.runs.create(
@@ -112,14 +82,3 @@ def run_assistant(thread):
     return new_message
 
 
-# --------------------------------------------------------------
-# Test assistant
-# --------------------------------------------------------------
-
-new_message = generate_response("What's the check in time?", "123", "John")
-
-new_message = generate_response("What's the pin for the lockbox?", "456", "Sarah")
-
-new_message = generate_response("What was my previous question?", "123", "John")
-
-new_message = generate_response("What was my previous question?", "456", "Sarah")
