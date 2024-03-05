@@ -19,12 +19,10 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-    // Assuming 'data' is an array of messages
-    data.forEach((message) => {
-        const responseDiv = document.createElement('div');
-        responseDiv.textContent = message; // Each message is directly displayed
-        chatBox.appendChild(responseDiv);
-    });
+    const responseDiv = document.createElement('div');
+    responseDiv.textContent = `Assistant: ${data.your}`; // Adjust this line based on actual key names in your JSON
+    chatBox.appendChild(responseDiv);
+    })
 })
     // Clear input after sending
     document.getElementById('user-input').value = '';
