@@ -1,11 +1,18 @@
 document.getElementById('chat-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
+    // Check if a session ID exists in localStorage, otherwise create one
+    let sessionID = localStorage.getItem('session_id');
+    if (!sessionID) {
+        sessionID = Date.now().toString(); // Simple generation, consider UUID for production
+        localStorage.setItem('session_id', sessionID);
+    }
+
     const userInput = document.getElementById('user-input').value;
     if (!userInput.trim()) return; // Skip empty inputs
 
     const chatBox = document.getElementById('chat-box');
-
+    
     // Display user's question
     const userDiv = document.createElement('div');
     userDiv.classList.add('user-message'); // Add class for user messages
@@ -27,7 +34,8 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({content: userInput})
+        // Include the session_id with the content
+        body: JSON.stringify({content: userInput, session_id: sessionID})
     })
     .then(response => response.json())
     .then(data => {
