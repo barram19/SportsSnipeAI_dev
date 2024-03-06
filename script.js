@@ -29,13 +29,27 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     loadingIndicator.style.display = 'block'; // Make it visible
     placeholderDiv.appendChild(loadingIndicator);
 
+    // Send OPTIONS request first
     fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
-        method: 'POST',
+        method: 'OPTIONS',
         headers: {
             'Content-Type': 'application/json',
         },
-        // Include the session_id with the content
-        body: JSON.stringify({content: userInput, session_id: sessionID})
+    })
+    .then(response => {
+        if (response.ok) {
+            // If OPTIONS request is successful, proceed with the POST request
+            return fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // Include the session_id with the content
+                body: JSON.stringify({content: userInput, session_id: sessionID})
+            });
+        } else {
+            throw new Error('Failed to fetch');
+        }
     })
     .then(response => response.json())
     .then(data => {
