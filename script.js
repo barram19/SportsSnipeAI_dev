@@ -32,7 +32,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     loadingIndicator.style.display = 'block'; // Make it visible
     placeholderDiv.appendChild(loadingIndicator);
 
-    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv2', {
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
