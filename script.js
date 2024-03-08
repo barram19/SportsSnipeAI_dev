@@ -33,7 +33,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     placeholderDiv.appendChild(loadingIndicator);
 
     // Send OPTIONS request first
-    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv2', {
         method: 'OPTIONS',
         headers: {
             'Content-Type': 'application/json',
