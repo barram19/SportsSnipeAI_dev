@@ -24,7 +24,7 @@ body {
     min-height: 300px; /* Minimum height of the chat box */
     max-height: 600px; /* Maximum height before scrolling */
     overflow-y: auto; /* Allows scrolling when content exceeds max-height */
-    background-color: #ffffff; /* Lighter background for contrast */
+    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); /* Futuristic gradient background */
     padding: 20px;
     border-bottom: 1px solid #0077CC; /* Softer blue */
     border-radius: 18px 18px 0 0;
