@@ -1,87 +1,98 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
     background-image: url('background.jpg');
     background-size: cover; /* Cover the entire page */
     background-position: center; /* Center the background image */
-    color: #FFFFFF; /* White text for readability */
-    font-size: 16px;
+    color: #333; /* Darker text for better contrast */
+    font-size: 18px; /* Slightly larger base font size */
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 #chat-container {
-    width: 60%;
+    width: 80%;
     max-width: 800px;
-    margin: 5% auto;
-    border: 2px solid #1E90FF; /* Vibrant blue border */
-    background-color: #121212; /* Slightly lighter dark background for the chat area */
-    box-shadow: 0 4px 8px rgba(30, 144, 255, 0.2); /* Blue shadow for depth */
-    border-radius: 12px;
+    margin: 3% auto;
+    border: 1px solid #0077CC; /* Softer blue border */
+    background-color: #f9f9f9; /* Lighter background for the chat area */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Softer shadow */
+    border-radius: 20px;
 }
 
 #chat-box {
     height: 500px;
     overflow-y: auto;
-    background-color: #181818; /* Darker background for contrast */
+    background-color: #ffffff; /* Lighter background for contrast */
     padding: 20px;
-    border-bottom: 2px solid #1E90FF; /* Subtle separation with blue */
-    border-radius: 10px 10px 0 0;
+    border-bottom: 1px solid #0077CC; /* Softer blue */
+    border-radius: 18px 18px 0 0;
 }
 
 #chat-form {
     display: flex;
     padding: 10px;
-    background: #121212; /* Matching the chat-container background */
-    border-radius: 0 0 10px 10px;
+    background: #f9f9f9; /* Lighter to match chat-container */
+    border-radius: 0 0 18px 18px;
 }
 
 #chat-form input[type="text"] {
     flex: 1;
-    padding: 10px 15px;
-    border: 1px solid #1E90FF; /* Vibrant blue border */
-    background: #0A0A0A; /* Dark background */
-    color: #FFFFFF; /* White text */
-    border-radius: 25px;
+    padding: 12px 18px;
+    border: 1px solid #0077CC; /* Matching border color */
+    background: #e9e9e9; /* Slightly lighter background */
+    color: #333; /* Darker text color */
+    border-radius: 30px;
     margin-right: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
 }
 
 #chat-form button {
     padding: 10px 20px;
     border: none;
-    background-color: #1E90FF; /* Vibrant blue for button */
+    background-color: #0077CC; /* Consistent with the design */
     color: #FFFFFF;
-    border-radius: 25px;
+    border-radius: 30px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 #chat-form button:hover {
-    background-color: #007ACC; /* Slightly darker blue on hover */
+    background-color: #005fa3; /* Slightly darker blue on hover */
+    transform: translateY(-2px); /* Subtle lift effect */
 }
 
-/* Styles for user messages */
+.user-message, .assistant-response {
+    padding: 12px;
+    margin-bottom: 12px; /* Space after each message */
+    border-radius: 10px; /* Softer corners */
+}
+
 .user-message {
-    background-color: #202020; /* Darker shade for user messages */
-    color: #FFFFFF;
-    padding: 10px;
-    margin-bottom: 12px; /* Space after each message */
-    border-radius: 8px;
+    background-color: #e9e9e9; /* Lighter shade for user messages */
+    color: #333; /* For contrast */
 }
 
-/* Styles for assistant responses */
 .assistant-response {
-    background-color: #1E90FF; /* Lighter shade for assistant messages */
+    background-color: #0077CC; /* Slightly different shade for clarity */
     color: #FFFFFF;
-    padding: 10px;
-    margin-bottom: 12px; /* Space after each message */
-    border-radius: 8px;
 }
 
 #loading-indicator {
-    text-align: left; /* Align the content (the GIF) to the left */
-    padding-left: 10px; /* Add some left padding for spacing, adjust as needed *
-    width: 50px;
-    height: 50px;
+    text-align: left;
+    padding-left: 10px;
+    width: 10px;
+    height: 10px;
 }
 
+/* Responsive Design Tweaks */
+@media (max-width: 768px) {
+    #chat-container {
+        width: 95%;
+        margin: 2% auto;
+    }
+
+    #chat-box, #chat-form input[type="text"] {
+        padding: 15px; /* Increased padding for better touch interaction */
+    }
+}
