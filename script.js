@@ -19,6 +19,9 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     userDiv.textContent = `You: ${userInput}`;
     chatBox.appendChild(userDiv);
 
+    // Scroll to the latest message after adding the user's message
+    chatBox.scrollTop = chatBox.scrollHeight;
+
     // Create a placeholder for the loading indicator
     const placeholderDiv = document.createElement('div');
     placeholderDiv.classList.add('loading-placeholder');
@@ -64,7 +67,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
             chatBox.appendChild(responseDiv);
         });
 
-        // Scroll to the latest message
+        // Scroll to the latest message after adding the assistant's response
         chatBox.scrollTop = chatBox.scrollHeight;
     })
     .catch((error) => {
