@@ -39,7 +39,6 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({content: userInput, session_id: sessionID}),
-        credentials: 'include' // Include only if necessary for your use case
     })
     .then(response => {
         if (response.ok) {
