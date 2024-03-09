@@ -32,19 +32,32 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     loadingIndicator.style.display = 'block'; // Make it visible
     placeholderDiv.appendChild(loadingIndicator);
 
+    // Send OPTIONS request first
     fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
         method: 'POST',
+        method: 'OPTIONS',
         headers: {
             'Content-Type': 'application/json',
         },
+        // Include the session_id with the content
         body: JSON.stringify({content: userInput, session_id: sessionID})
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+        if (response.ok) {
+            // If OPTIONS request is successful, proceed with the POST request
+            return fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // Include the session_id with the content
+                body: JSON.stringify({content: userInput, session_id: sessionID})
+            });
+        } else {
+            throw new Error('Failed to fetch');
         }
-        return response.json();
     })
+    .then(response => response.json())
     .then(data => {
         // Handle success, remove the placeholder, display responses, etc.
         placeholderDiv.remove(); // Remove the loading indicator
