@@ -35,12 +35,11 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     // Send OPTIONS request first
     fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
         method: 'POST',
-        method: 'OPTIONS',
         headers: {
             'Content-Type': 'application/json',
         },
-        // Include the session_id with the content
-        body: JSON.stringify({content: userInput, session_id: sessionID})
+        body: JSON.stringify({content: userInput, session_id: sessionID}),
+        credentials: 'include' // Include only if necessary for your use case
     })
     .then(response => {
         if (response.ok) {
