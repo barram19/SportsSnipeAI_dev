@@ -36,11 +36,12 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(userInput)
-    })
+      body: JSON.stringify({content: userInput})
+    });
     .then(response => response.json())
+                                                      
     .then(data => {
         // Handle success, remove the placeholder, display responses, etc.
         placeholderDiv.remove(); // Remove the loading indicator
