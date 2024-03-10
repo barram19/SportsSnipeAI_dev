@@ -39,9 +39,8 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({content: userInput})
-    });
+    })
     .then(response => response.json())
-                                                      
     .then(data => {
         // Handle success, remove the placeholder, display responses, etc.
         placeholderDiv.remove(); // Remove the loading indicator
