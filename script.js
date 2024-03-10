@@ -32,17 +32,15 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     loadingIndicator.style.display = 'block'; // Make it visible
     placeholderDiv.appendChild(loadingIndicator);
 
-    const cors = require('cors-for-cloud-functions')
-
-    exports['https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3'] = (request, response) => {
+    // Make a POST request to your Flask endpoint
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestData)
+    })
     
-      const { req, res, isOptions } = cors(request, response)  
-    
-      if(isOptions) return res.send(204).('')
-      
-      return res.status(200).send('CORS works')
-     }
-
     .then(response => response.json())
     .then(data => {
         // Handle success, remove the placeholder, display responses, etc.
