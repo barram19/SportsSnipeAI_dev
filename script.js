@@ -50,6 +50,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
             const responseDiv = document.createElement('div');
             responseDiv.classList.add('assistant-response'); // Add class for assistant responses
             responseDiv.textContent = `Assistant: ${message}`;
+            responseDiv.textContent = message;
             chatBox.appendChild(responseDiv);
         });
 
