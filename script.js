@@ -48,7 +48,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
                     'Content-Type': 'application/json',
                 },
                 // Include the session_id with the content
-                body: JSON.stringify({content: userInput, session_id: sessionID})
+                body: JSON.stringify({ content: userInput, session_id: sessionID })
             });
         } else {
             throw new Error('Failed to fetch');
