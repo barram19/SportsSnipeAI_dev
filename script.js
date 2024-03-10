@@ -75,7 +75,6 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
         console.error('Error:', error);
         placeholderDiv.remove(); // Ensure to remove the placeholder even if an error occurs
     });
-
     // Clear input after sending
     document.getElementById('user-input').value = '';
 });
