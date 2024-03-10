@@ -38,9 +38,8 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(requestData)
+      body: JSON.stringify(userInput)
     })
-    
     .then(response => response.json())
     .then(data => {
         // Handle success, remove the placeholder, display responses, etc.
