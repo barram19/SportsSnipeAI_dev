@@ -1,4 +1,4 @@
-document.getElementById('chat-form').addEventListener('submit', function(e) {
+document.getElementById('chat-form').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const userInput = document.getElementById('user-input').value;
@@ -16,27 +16,27 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
 
     const threadID = localStorage.getItem('threadID'); // Retrieve stored thread ID, if any
 
-    sendMessageToServer(userInput, threadID);
+    await sendMessageToServer(userInput, threadID);
     
     // Clear input after sending
     document.getElementById('user-input').value = '';
 });
 
-function sendMessageToServer(userInput, threadID) {
+async function sendMessageToServer(userInput, threadID) {
     const chatBox = document.getElementById('chat-box');
     // Create a placeholder for the loading indicator
     const placeholderDiv = createLoadingIndicator();
     chatBox.appendChild(placeholderDiv);
 
-    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content: userInput, thread_id: threadID }) // Include thread ID in the request
-    })
-    .then(response => response.json())
-    .then(data => {
+    try {
+        const response = await fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content: userInput, thread_id: threadID }) // Include thread ID in the request
+        });
+        const data = await response.json();
         placeholderDiv.remove(); // Remove the loading indicator
 
         if (data.thread_id) {
@@ -51,11 +51,10 @@ function sendMessageToServer(userInput, threadID) {
 
         // Start polling for updates after a short delay
         setTimeout(() => checkForUpdates(data.thread_id), 1000);
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error:', error);
         placeholderDiv.remove(); // Ensure to remove the placeholder even if an error occurs
-    });
+    }
 }
 
 function createLoadingIndicator() {
@@ -76,19 +75,21 @@ function displayMessage(message) {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function checkForUpdates(threadID) {
-    fetch(`https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes/check-updates?thread_id=${threadID}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.messages.length > 0) {
-                data.messages.forEach(message => {
-                    displayMessage(message.content); // Display each message
-                });
-            }
-            if (!data.final) {
-                // If not final, keep checking
-                setTimeout(() => checkForUpdates(threadID), 3000);
-            }
-        })
-        .catch(error => console.error('Error:', error));
+async function checkForUpdates(threadID) {
+    try {
+        const response = await fetch(`https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes/check-updates?thread_id=${threadID}`);
+        const data = await response.json();
+
+        if (data.messages && data.messages.length > 0) {
+            data.messages.forEach(message => {
+                displayMessage(message.content); // Display each message
+            });
+        }
+        if (!data.final) {
+            // If not final, keep checking
+            setTimeout(() => checkForUpdates(threadID), 3000);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
