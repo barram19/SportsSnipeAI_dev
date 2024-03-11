@@ -28,7 +28,7 @@ function sendMessageToServer(userInput, threadID) {
     const placeholderDiv = createLoadingIndicator();
     chatBox.appendChild(placeholderDiv);
 
-    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv2', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ function displayMessage(message) {
 }
 
 function checkForUpdates(threadID) {
-    fetch(`https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3/check-updates?thread_id=${threadID}`)
+    fetch(`https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv2/check-updates?thread_id=${threadID}`)
         .then(response => response.json())
         .then(data => {
             if (data.messages.length > 0) {
