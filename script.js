@@ -25,7 +25,10 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     loadingIndicator.style.display = 'block'; // Make it visible
     placeholderDiv.appendChild(loadingIndicator);
 
-   // Send OPTIONS request first
+    // Retrieve stored thread ID, if any
+    const threadID = localStorage.getItem('threadID');
+
+    // Send OPTIONS request first
     fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
         method: 'OPTIONS',
         headers: {
@@ -40,8 +43,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                // Include the session_id with the content
-                body: JSON.stringify({ content: userInput })
+                body: JSON.stringify({ content: userInput, thread_id: threadID }) // Include thread ID in the request
             });
         } else {
             throw new Error('Failed to fetch');
@@ -52,12 +54,16 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
         // Remove the placeholder
         placeholderDiv.remove();
 
+        // Save the thread ID for future use
+        if (data.thread_id) {
+            localStorage.setItem('threadID', data.thread_id);
+        }
+
         // Display the assistant's response(s)
         data.messages.forEach((message) => {
             const responseDiv = document.createElement('div');
             responseDiv.classList.add('assistant-response'); // Add class for assistant responses
             responseDiv.textContent = `Assistant: ${message}`;
-            responseDiv.textContent = message;
             chatBox.appendChild(responseDiv);
         });
 
