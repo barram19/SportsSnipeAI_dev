@@ -1,13 +1,6 @@
 document.getElementById('chat-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    // Check if a session ID exists in localStorage, otherwise create one
-    let sessionID = localStorage.getItem('session_id');
-    if (!sessionID) {
-        sessionID = Date.now().toString(); // Simple generation, consider UUID for production
-        localStorage.setItem('session_id', sessionID);
-    }
-
     const userInput = document.getElementById('user-input').value;
     if (!userInput.trim()) return; // Skip empty inputs
 
@@ -48,7 +41,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
                     'Content-Type': 'application/json',
                 },
                 // Include the session_id with the content
-                body: JSON.stringify({ content: userInput, session_id: sessionID })
+                body: JSON.stringify({ content: userInput })
             });
         } else {
             throw new Error('Failed to fetch');
