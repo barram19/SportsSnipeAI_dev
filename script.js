@@ -1,4 +1,4 @@
-document.getElementById('chat-form').addEventListener('submit', async function(e) {
+document.getElementById('chat-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const userInput = document.getElementById('user-input').value;
@@ -12,84 +12,103 @@ document.getElementById('chat-form').addEventListener('submit', async function(e
     userDiv.textContent = `You: ${userInput}`;
     chatBox.appendChild(userDiv);
 
-    chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the latest message
+    // Scroll to the latest message after adding the user's message
+    chatBox.scrollTop = chatBox.scrollHeight;
 
-    const threadID = localStorage.getItem('threadID'); // Retrieve stored thread ID, if any
+    // Create a placeholder for the loading indicator
+    const placeholderDiv = document.createElement('div');
+    placeholderDiv.classList.add('loading-placeholder');
+    chatBox.appendChild(placeholderDiv);
 
-    await sendMessageToServer(userInput, threadID);
-    
+    // Show the loading indicator inside the placeholder
+    const loadingIndicator = document.getElementById('loading-indicator').cloneNode(true);
+    loadingIndicator.style.display = 'block'; // Make it visible
+    placeholderDiv.appendChild(loadingIndicator);
+
+    // Retrieve stored thread ID, if any
+    const threadID = localStorage.getItem('threadID');
+
+    // Send OPTIONS request first
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
+        method: 'OPTIONS',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (response.ok) {
+            // If OPTIONS request is successful, proceed with the POST request
+            return fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content: userInput, thread_id: threadID }) // Include thread ID in the request
+            });
+        } else {
+            throw new Error('Failed to fetch');
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Remove the placeholder
+        placeholderDiv.remove();
+
+        // Save the thread ID for future use
+        if (data.thread_id) {
+            localStorage.setItem('threadID', data.thread_id);
+        }
+
+        // Display the assistant's response(s)
+        data.messages.forEach((message) => {
+            const responseDiv = document.createElement('div');
+            responseDiv.classList.add('assistant-response'); // Add class for assistant responses
+            responseDiv.textContent = message;
+            chatBox.appendChild(responseDiv);
+        });
+
+        // Scroll to the latest message after adding the assistant's response
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Start polling for updates if there's a thread ID
+        if (data.thread_id) {
+            setTimeout(() => pollForUpdates(data.thread_id), 3000); // Start polling after a delay
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        placeholderDiv.remove(); // Ensure to remove the placeholder even if an error occurs
+    });
+
     // Clear input after sending
     document.getElementById('user-input').value = '';
 });
 
-async function sendMessageToServer(userInput, threadID) {
-    const chatBox = document.getElementById('chat-box');
-    // Create a placeholder for the loading indicator
-    const placeholderDiv = createLoadingIndicator();
-    chatBox.appendChild(placeholderDiv);
-
-    try {
-        const response = await fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ content: userInput, thread_id: threadID }) // Include thread ID in the request
-        });
-        const data = await response.json();
-        placeholderDiv.remove(); // Remove the loading indicator
-
+function pollForUpdates(threadID) {
+    fetch(`https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3/poll?thread_id=${threadID}`, {
+        method: 'GET', // Assuming a new endpoint or method to poll for updates
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.messages && data.messages.length > 0) {
+            const chatBox = document.getElementById('chat-box');
+            data.messages.forEach((message) => {
+                const responseDiv = document.createElement('div');
+                responseDiv.classList.add('assistant-response');
+                responseDiv.textContent = message;
+                chatBox.appendChild(responseDiv);
+            });
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        // If there's still a thread active, keep polling
         if (data.thread_id) {
-            localStorage.setItem('threadID', data.thread_id); // Save the thread ID for future use
+            setTimeout(() => pollForUpdates(threadID), 3000); // Adjust delay as needed
         }
-
-        if (data.messages && data.messages.length > 0) {
-            data.messages.forEach(message => {
-                displayMessage(message);
-            });
-        }
-
-        // Start polling for updates after a short delay
-        setTimeout(() => checkForUpdates(data.thread_id), 1000);
-    } catch (error) {
+    })
+    .catch((error) => {
         console.error('Error:', error);
-        placeholderDiv.remove(); // Ensure to remove the placeholder even if an error occurs
-    }
-}
-
-function createLoadingIndicator() {
-    const placeholderDiv = document.createElement('div');
-    placeholderDiv.classList.add('loading-placeholder');
-    const loadingIndicator = document.getElementById('loading-indicator').cloneNode(true);
-    loadingIndicator.style.display = 'block'; // Make it visible
-    placeholderDiv.appendChild(loadingIndicator);
-    return placeholderDiv;
-}
-
-function displayMessage(message) {
-    const chatBox = document.getElementById('chat-box');
-    const responseDiv = document.createElement('div');
-    responseDiv.classList.add('assistant-response');
-    responseDiv.textContent = message;
-    chatBox.appendChild(responseDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-async function checkForUpdates(threadID) {
-    try {
-        const response = await fetch(`https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes/check-updates?thread_id=${threadID}`);
-        const data = await response.json();
-
-        if (data.messages && data.messages.length > 0) {
-            data.messages.forEach(message => {
-                displayMessage(message.content); // Display each message
-            });
-        }
-        if (!data.final) {
-            // If not final, keep checking
-            setTimeout(() => checkForUpdates(threadID), 3000);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-    }
+    });
 }
