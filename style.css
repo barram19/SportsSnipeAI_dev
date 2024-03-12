@@ -63,7 +63,7 @@ body {
     transform: translateY(-2px); /* Subtle lift effect */
 }
 
-.user-message, .assistant-response {
+.user-message, .openai-response {
     padding: 12px;
     margin-bottom: 12px; /* Space after each message */
     border-radius: 10px; /* Softer corners */
