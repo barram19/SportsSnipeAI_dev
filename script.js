@@ -29,7 +29,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     const threadID = localStorage.getItem('threadID');
 
     // Send OPTIONS request first
-    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
         method: 'OPTIONS',
         headers: {
             'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     .then(response => {
         if (response.ok) {
             // If OPTIONS request is successful, proceed with the POST request
-            return fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
+            return fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -57,6 +57,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
         // Save the thread ID for future use
         if (data.thread_id) {
             localStorage.setItem('threadID', data.thread_id);
+            pollForUpdates(data.thread_id);
         }
 
         // Display the assistant's response(s)
@@ -85,7 +86,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
 });
 
 function pollForUpdates(threadID) {
-    fetch(`https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3/poll?thread_id=${threadID}`, {
+    fetch(`https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes/poll?thread_id=${threadID}`, {
         method: 'GET', // Assuming a new endpoint or method to poll for updates
         headers: {
             'Content-Type': 'application/json',
