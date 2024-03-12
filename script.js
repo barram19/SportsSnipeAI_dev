@@ -54,7 +54,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
         // Display the assistant's response
         const responseDiv = document.createElement('div');
         responseDiv.classList.add('openai-response'); // Add class for assistant responses
-        responseDiv.textContent = `Assistant: ${data.message}`; // Use data.message based on your Flask response structure
+        responseDiv.textContent = ` ${data.message}`; // Use data.message based on your Flask response structure
         chatBox.appendChild(responseDiv);
     
         // Scroll to the latest message after adding the assistant's response
