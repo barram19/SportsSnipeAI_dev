@@ -10,6 +10,15 @@ body {
     box-sizing: border-box;
 }
 
+/* Adjustments for mobile devices */
+@media (max-width: 768px) {
+    body {
+        background-size: auto 100%; /* Adjust background size to fit the screen height */
+        background-position: bottom center; /* Adjust background position for mobile */
+    }
+}
+
+
 #chat-container {
     width: 80%;
     max-width: 800px;
@@ -18,6 +27,9 @@ body {
     background-color: #f9f9f9; /* Lighter background for the chat area */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Softer shadow */
     border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 #chat-box {
@@ -63,7 +75,13 @@ body {
     transform: translateY(-2px); /* Subtle lift effect */
 }
 
-.user-message, .openai-response {
+#chat-form button:disabled {
+    background-color: grey;
+    color: white;
+    cursor: not-allowed;
+}
+
+.user-message, .assistant-response {
     padding: 12px;
     margin-bottom: 12px; /* Space after each message */
     border-radius: 10px; /* Softer corners */
@@ -89,9 +107,11 @@ body {
 /* Responsive Design Tweaks */
 @media (max-width: 768px) {
     #chat-container {
-        width: 95%;
+        width: 75%;
         margin: 2% auto;
+        
     }
+    
 
     #chat-box, #chat-form input[type="text"] {
         padding: 15px; /* Increased padding for better touch interaction */
