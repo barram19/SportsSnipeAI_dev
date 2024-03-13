@@ -1,32 +1,41 @@
 document.getElementById('chat-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    const userInput = document.getElementById('user-input').value;
+    const userInputField = document.getElementById('user-input');
+    const sendButton = this.querySelector('button[type="submit"]');
+    const userInput = userInputField.value;
     if (!userInput.trim()) return; // Skip empty inputs
 
     const chatBox = document.getElementById('chat-box');
     
-    // Display user's question
     const userDiv = document.createElement('div');
-    userDiv.classList.add('user-message'); // Add class for user messages
+    userDiv.classList.add('user-message');
     userDiv.textContent = `You: ${userInput}`;
     chatBox.appendChild(userDiv);
 
-    // Scroll to the latest message after adding the user's message
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    // Create a placeholder for the loading indicator
     const placeholderDiv = document.createElement('div');
     placeholderDiv.classList.add('loading-placeholder');
     chatBox.appendChild(placeholderDiv);
 
-    // Show the loading indicator inside the placeholder
     const loadingIndicator = document.getElementById('loading-indicator').cloneNode(true);
-    loadingIndicator.style.display = 'block'; // Make it visible
+    loadingIndicator.style.display = 'block';
     placeholderDiv.appendChild(loadingIndicator);
 
-    // Send OPTIONS request first
-    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
+    userInputField.disabled = true;
+    sendButton.disabled = true;
+
+    userInputField.value = '';
+
+    // Updated part: Get or initialize threadID from sessionStorage
+    let sessionData = sessionStorage.getItem('sessionData');
+    let threadID = null;
+    if (sessionData) {
+        threadID = JSON.parse(sessionData).threadID;
+    }
+
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
         method: 'OPTIONS',
         headers: {
             'Content-Type': 'application/json',
@@ -34,13 +43,12 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     })
     .then(response => {
         if (response.ok) {
-            // If OPTIONS request is successful, proceed with the POST request
-            return fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
+            return fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ content: userInput }) // Send user input
+                body: JSON.stringify({ content: userInput, thread_id: threadID })
             });
         } else {
             throw new Error('Failed to fetch');
@@ -48,23 +56,28 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-        // Remove the placeholder
         placeholderDiv.remove();
-        
-        // Display the assistant's response
-        const responseDiv = document.createElement('div');
-        responseDiv.classList.add('openai-response'); // Add class for assistant responses
-        responseDiv.textContent = ` ${data.message}`; // Use data.message based on your Flask response structure
-        chatBox.appendChild(responseDiv);
-    
-        // Scroll to the latest message after adding the assistant's response
-        chatBox.scrollTop = chatBox.scrollHeight;    
+
+        // Store or update threadID in sessionStorage
+        if (data.thread_id) {
+            sessionStorage.setItem('sessionData', JSON.stringify({threadID: data.thread_id}));
+        }
+
+        data.messages.forEach((message) => {
+            const responseDiv = document.createElement('div');
+            responseDiv.classList.add('assistant-response');
+            responseDiv.innerHTML = message;
+            chatBox.appendChild(responseDiv);
+        });
+
+        chatBox.scrollTop = chatBox.scrollHeight;
     })
     .catch((error) => {
         console.error('Error:', error);
-        placeholderDiv.remove(); // Ensure to remove the placeholder even if an error occurs
+        placeholderDiv.remove();
+    })
+    .finally(() => {
+        userInputField.disabled = false;
+        sendButton.disabled = false;
     });
-
-    // Clear input after sending
-    document.getElementById('user-input').value = '';
 });
