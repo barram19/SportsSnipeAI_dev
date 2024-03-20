@@ -34,7 +34,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
         threadID = JSON.parse(sessionData).threadID;
     }
 
-    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
