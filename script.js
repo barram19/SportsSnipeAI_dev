@@ -34,12 +34,24 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
         threadID = JSON.parse(sessionData).threadID;
     }
 
-    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
-        method: 'POST',
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
+        method: 'OPTIONS',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content: userInput, thread_id: threadID })
+    })
+    .then(response => {
+        if (response.ok) {
+            return fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content: userInput, thread_id: threadID })
+            });
+        } else {
+            throw new Error('Failed to fetch');
+        }
     })
     .then(response => response.json())
     .then(data => {
