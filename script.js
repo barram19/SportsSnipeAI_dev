@@ -72,7 +72,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
 });
 
 function pollForMessages(threadID, lastMessageID = null) {
-    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/message_poll', {
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes/message_poll', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
