@@ -28,49 +28,26 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
 
     userInputField.value = '';
 
-    // Updated part: Get or initialize threadID from sessionStorage
     let sessionData = sessionStorage.getItem('sessionData');
     let threadID = null;
     if (sessionData) {
         threadID = JSON.parse(sessionData).threadID;
     }
 
-    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
-        method: 'OPTIONS',
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipesv3', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-    })
-    .then(response => {
-        if (response.ok) {
-            return fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/barrysnipes', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ content: userInput, thread_id: threadID })
-            });
-        } else {
-            throw new Error('Failed to fetch');
-        }
+        body: JSON.stringify({ content: userInput, thread_id: threadID })
     })
     .then(response => response.json())
     .then(data => {
         placeholderDiv.remove();
-
-        // Store or update threadID in sessionStorage
         if (data.thread_id) {
             sessionStorage.setItem('sessionData', JSON.stringify({threadID: data.thread_id}));
+            pollForMessages(data.thread_id); // Start polling for messages
         }
-
-        data.messages.forEach((message) => {
-            const responseDiv = document.createElement('div');
-            responseDiv.classList.add('assistant-response');
-            responseDiv.innerHTML = message;
-            chatBox.appendChild(responseDiv);
-        });
-
-        chatBox.scrollTop = chatBox.scrollHeight;
     })
     .catch((error) => {
         console.error('Error:', error);
@@ -81,3 +58,34 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
         sendButton.disabled = false;
     });
 });
+
+function pollForMessages(threadID, lastMessageID = null) {
+    fetch('https://us-central1-cbbbot-413503.cloudfunctions.net/message_poll', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ thread_id: threadID, last_message_id: lastMessageID })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const chatBox = document.getElementById('chat-box');
+        if (data && data.length > 0) {
+            data.forEach((message) => {
+                const responseDiv = document.createElement('div');
+                responseDiv.classList.add('assistant-response');
+                responseDiv.innerHTML = message.content; // Assuming your backend sends HTML content
+                chatBox.appendChild(responseDiv);
+
+                lastMessageID = message.id; // Update the lastMessageID with the newest message
+            });
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        // Continue polling
+        setTimeout(() => pollForMessages(threadID, lastMessageID), 5000);
+    })
+    .catch((error) => {
+        console.error('Polling error:', error);
+    });
+}
